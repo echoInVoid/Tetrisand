@@ -20,6 +20,8 @@ def renderBackground(screen: pyg.surface.Surface):
 def renderSand(screen: pyg.surface.Surface):
     """渲染沙子"""
     
+    sandsLock.acquire() # 为 sands 加锁
+
     for x in range(setting.sandListSize[0]):
         for y in range (setting.sandListSize[1]):
             if sands[x][y] != VOID:
@@ -33,6 +35,8 @@ def renderSand(screen: pyg.surface.Surface):
                         setting.sandSize
                         )
                 )
+    
+    sandsLock.release() # 释放锁
 
 def render(screen: pyg.surface.Surface):
     """

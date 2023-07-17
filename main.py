@@ -4,6 +4,7 @@ import threading
 import pygame as pyg
 
 from render import render
+from sandProcess import update
 from settings import setting
 
 
@@ -16,6 +17,10 @@ def main():
     # 主渲染进程
     renderThread = threading.Thread(None, render, "renderThread", (screen,))
     renderThread.start()
+
+    # 主更新进程
+    updateThread = threading.Thread(None, update, "updateThread")
+    updateThread.start()
 
     while True:
         # 监听事件

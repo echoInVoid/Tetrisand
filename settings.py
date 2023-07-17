@@ -15,7 +15,6 @@ class Setting:
 
         self.sandSize = 4 # 单颗沙粒的边长
         self.sandListSize = (self.sandArea.width//self.sandSize, self.sandArea.height//self.sandSize) # 沙粒列表的尺寸
-        print(self.sandListSize)
 
         self.fps = 30
         self.tps = 20

@@ -1,4 +1,7 @@
+from threading import Lock
+
 from settings import setting
+
 
 class Sand:
     """
@@ -19,5 +22,7 @@ SAND_GREEN2 = Sand(0, "#466B1F")
 SAND_BLUE1 = Sand(0, "#305995")
 SAND_BLUE2 = Sand(0, "#28497A")
 
-sands = [ [VOID for i in range(setting.sandListSize[1])]
+sands = [ [ VOID for i in range(setting.sandListSize[1]) ]
          for j in range(setting.sandListSize[0]) ]
+
+sandsLock = Lock()
