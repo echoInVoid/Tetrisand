@@ -11,6 +11,7 @@ def renderBackground(screen: pyg.surface.Surface):
     bgSign += 0.2
     bgSign %= 25
     screen.blit(setting.bgImage, (-bgSign, -bgSign))
+    screen.blit(setting.coverImage, (0, 0))
 
 def render(screen: pyg.surface.Surface):
     """
