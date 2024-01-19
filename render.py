@@ -1,6 +1,7 @@
 import pygame as pyg
 
 from settings import setting
+from status import status
 from sand import *
 
 renderClock = pyg.time.Clock()
@@ -38,6 +39,36 @@ def renderSand(screen: pyg.surface.Surface):
     
     sandsLock.release() # 释放锁
 
+def renderGhost(screen: pyg.surface.Surface):
+    """渲染提示虚影"""
+
+    curShape = status.curShape
+    ghostWidth = len(curShape.l[0])*setting.blockSize*setting.sandSize
+
+    ghostX = pyg.mouse.get_pos()[0] # 虚影左上角x坐标
+    ghostX -= ghostWidth//2
+    ghostX = max(setting.sandArea.left, ghostX)
+    ghostX = min(setting.sandArea.right-ghostWidth, ghostX)
+
+    ghost = curShape.l
+    ghostColor:pyg.color.Color = SANDS_LIGHT[status.curType].color
+    ghostColor.a = 128
+
+    rect = pyg.Surface(
+            (setting.sandSize*setting.blockSize, setting.sandSize*setting.blockSize),
+            pyg.SRCALPHA
+        )
+    rect.fill(ghostColor)
+
+    for i in range(len(ghost[0])):
+        for j in range(len(ghost)):
+            if (ghost[j][i]):
+                rectPos = (
+                    ghostX + i*setting.sandSize*setting.blockSize,
+                    setting.sandArea.top + j*setting.sandSize*setting.blockSize
+                )
+                screen.blit(rect, rectPos)
+
 def render(screen: pyg.surface.Surface):
     """
     主渲染器，负责将游戏中的一切渲染到屏幕上
@@ -53,6 +84,7 @@ def render(screen: pyg.surface.Surface):
         
         renderBackground(screen)
         renderSand(screen)
+        renderGhost(screen)
 
         pyg.display.flip()
         renderClock.tick(setting.fps)
