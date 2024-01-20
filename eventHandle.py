@@ -8,6 +8,7 @@ def eventHandler():
         if event.type == pyg.QUIT:
             # 命令所有线程退出
             setting.needToQuit = True
+
         # 键盘事件
         if event.type == pyg.KEYDOWN:
             # 旋转当前形状
@@ -17,3 +18,7 @@ def eventHandler():
                 status.curShape.rotate()
                 status.curShape.rotate()
                 status.curShape.rotate()
+        
+        if event.type == pyg.MOUSEBUTTONDOWN:
+            # 放置沙子
+            status.placeSand = True

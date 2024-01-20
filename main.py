@@ -4,7 +4,7 @@ import threading
 import pygame as pyg
 
 from render import render
-from sandProcess import update
+from update import update
 from eventHandle import eventHandler
 from settings import setting
 

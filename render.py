@@ -53,7 +53,7 @@ def renderGhost(screen: pyg.surface.Surface):
 
     ghost = curShape.l
     ghostColor:pyg.color.Color = SANDS_LIGHT[status.curType].color
-    ghostColor.a = 128
+    ghostColor.a = int(128 * (1 - status.placeCD/setting.placeCD)) # 让虚影随着CD减少逐渐变得不透明
 
     rect = pyg.Surface(
             (setting.sandSize*setting.blockSize, setting.sandSize*setting.blockSize),
@@ -63,7 +63,7 @@ def renderGhost(screen: pyg.surface.Surface):
 
     for i in range(len(ghost)):
         for j in range(len(ghost[0])):
-            if (ghost[i][j]):
+            if ghost[i][j]:
                 rectPos = (
                     ghostX + i*setting.sandSize*setting.blockSize,
                     setting.sandArea.top + j*setting.sandSize*setting.blockSize

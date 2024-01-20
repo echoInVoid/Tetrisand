@@ -7,7 +7,7 @@ class Shape:
             self.l.append([])
             self.l[-1] = list(map(bool, map(int, i)))
     
-    def _extend(self) -> 'list[list[bool]]':
+    def extend(self) -> 'list[list[bool]]':
         """将这个形状展开成可用于放置沙子的列表"""
         width = len(self.l) * setting.blockSize
         height = len(self.l[0]) * setting.blockSize
