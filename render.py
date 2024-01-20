@@ -43,12 +43,13 @@ def renderGhost(screen: pyg.surface.Surface):
     """渲染提示虚影"""
 
     curShape = status.curShape
-    ghostWidth = len(curShape.l[0])*setting.blockSize*setting.sandSize
+    ghostWidth = len(curShape.l)*setting.blockSize*setting.sandSize
 
     ghostX = pyg.mouse.get_pos()[0] # 虚影左上角x坐标
     ghostX -= ghostWidth//2
     ghostX = max(setting.sandArea.left, ghostX)
     ghostX = min(setting.sandArea.right-ghostWidth, ghostX)
+    ghostX -= ghostX%setting.sandSize
 
     ghost = curShape.l
     ghostColor:pyg.color.Color = SANDS_LIGHT[status.curType].color
@@ -60,9 +61,9 @@ def renderGhost(screen: pyg.surface.Surface):
         )
     rect.fill(ghostColor)
 
-    for i in range(len(ghost[0])):
-        for j in range(len(ghost)):
-            if (ghost[j][i]):
+    for i in range(len(ghost)):
+        for j in range(len(ghost[0])):
+            if (ghost[i][j]):
                 rectPos = (
                     ghostX + i*setting.sandSize*setting.blockSize,
                     setting.sandArea.top + j*setting.sandSize*setting.blockSize

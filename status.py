@@ -5,12 +5,15 @@ from sand import SANDS_LIGHT
 
 class Status:
     def __init__(self):
-        self.curShape = None # 下一个放置的形状
-        self.curType = None # 下一个放置的沙子种类
-        self.nextSand()
+        self.curShape = choice(SHAPES) # 下一个放置的形状
+        self.curType = randint(0, len(SANDS_LIGHT)-1) # 下一个放置的沙子种类
     
-    def nextSand(self):
+    def nextPlacement(self):
+        """随机选取下次要放置的沙子形状与颜色"""
         self.curShape = choice(SHAPES)
+        for i in range(randint(0,3)): # 随机旋转下一个形状
+            self.curShape.rotate()
         self.curType = randint(0, len(SANDS_LIGHT)-1)
+    
 
 status = Status()

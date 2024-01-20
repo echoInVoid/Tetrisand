@@ -5,6 +5,7 @@ import pygame as pyg
 
 from render import render
 from sandProcess import update
+from eventHandle import eventHandler
 from settings import setting
 
 
@@ -24,15 +25,13 @@ def main():
 
     while True:
         # 监听事件
-        for event in pyg.event.get():
-            if event.type == pyg.QUIT:
-                # 命令所有线程退出
-                setting.needToQuit = True
+        eventHandler()
         
         # 退出
         if setting.needToQuit:
             break
     
+    pyg.quit()
     sys.exit()
     
 if __name__ == "__main__":

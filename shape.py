@@ -19,6 +19,15 @@ class Shape:
         
         return result
 
+    def rotate(self) -> None:
+        """顺时针旋转自身"""
+        rows = len(self.l)
+        cols = len(self.l[0])
+        tmp = [[False]*rows for _ in range(cols)]
+        for i in range(rows):
+            for j in range(cols):
+                tmp[j][rows-i-1] = self.l[i][j]
+        self.l = tmp
 
 SHAPE1 = Shape("10\n10\n11") # L
 SHAPE2 = Shape("01\n01\n11") # 反 L
