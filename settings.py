@@ -8,13 +8,21 @@ class Setting:
         self.bgImage = pyg.image.load(".\\res\\bg.png")
         self.coverImage = pyg.image.load(".\\res\\cover.png")
 
-        self.infoArea = pyg.rect.Rect(48,32,504,112) # 屏幕最上方的计分板
-        self.sandArea = pyg.rect.Rect(44,192,340,560) # 主要游戏区
-        self.shapeArea = pyg.rect.Rect(424,212,116,116) # 显示下一个方块形状的区域
-        self.colorArea = pyg.rect.Rect(456,540,52,108) # 显示下一个方块颜色的区域
+        # 屏幕最上方的计分板
+        self.infoArea = pyg.surface.Surface((504,112))
+        self.infoPos = (48,32)
+        # 主要游戏区
+        self.sandArea = pyg.surface.Surface((340,560))
+        self.sandPos = (44,192)
+        # 显示下一个方块形状的区域
+        self.shapeArea = pyg.surface.Surface((116,116))
+        self.shapePos = (424,212)
+        # 显示下一个方块颜色的区域
+        self.colorArea = pyg.surface.Surface((52,108))
+        self.colorPos = (456,540)
 
         self.sandSize = 4 # 单颗沙粒的边长
-        self.sandListSize = (self.sandArea.width//self.sandSize, self.sandArea.height//self.sandSize) # 沙粒列表的尺寸
+        self.sandListSize = (self.sandArea.get_width()//self.sandSize, self.sandArea.get_height()//self.sandSize) # 沙粒列表的尺寸
         self.blockSize = 10 # 一个块的边长，单位是沙粒
 
         self.fps = 30

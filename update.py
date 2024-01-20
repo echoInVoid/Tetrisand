@@ -29,10 +29,10 @@ def putSand():
     # 待放置的形状左上角x坐标
     x = pyg.mouse.get_pos()[0]
     x -= width*setting.sandSize//2
-    x = max(setting.sandArea.left, x)
-    x = min(setting.sandArea.right - width*setting.sandSize, x)
+    x = max(setting.sandPos[0], x)
+    x = min(setting.sandPos[0]+setting.sandArea.get_width() - width*setting.sandSize, x)
     x -= x % setting.sandSize
-    x -= setting.sandArea.left
+    x -= setting.sandPos[0]
     x = x//setting.sandSize
 
     for i in range(width):

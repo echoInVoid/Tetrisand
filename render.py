@@ -8,6 +8,11 @@ renderClock = pyg.time.Clock()
 
 bgSign = 0 # 随帧变化，决定背景图片的移动
 
+def flipAllAreas():
+    setting.sandArea.fill("#000000")
+    setting.infoArea.fill("#FFFFFF")
+    setting.shapeArea.fill("#000000")
+
 def renderBackground(screen: pyg.surface.Surface):
     """渲染游戏背景"""
 
@@ -18,7 +23,7 @@ def renderBackground(screen: pyg.surface.Surface):
     screen.blit(setting.coverImage, (0, 0))
     screen.set_colorkey()
 
-def renderSand(screen: pyg.surface.Surface):
+def renderSand():
     """渲染沙子"""
     
     sandsLock.acquire() # 为 sands 加锁
@@ -28,18 +33,18 @@ def renderSand(screen: pyg.surface.Surface):
             if sands[x][y] != VOID:
                 sand = sands[x][y]
                 pyg.draw.rect(
-                    screen, sand.color,
+                    setting.sandArea, sand.color,
                     pyg.rect.Rect(
-                        setting.sandArea.left+x*setting.sandSize, 
-                        setting.sandArea.top+y*setting.sandSize, 
+                        x*setting.sandSize, 
+                        y*setting.sandSize, 
                         setting.sandSize, 
                         setting.sandSize
-                        )
+                    )
                 )
     
     sandsLock.release() # 释放锁
 
-def renderGhost(screen: pyg.surface.Surface):
+def renderGhost():
     """渲染提示虚影"""
 
     curShape = status.curShape
@@ -47,8 +52,9 @@ def renderGhost(screen: pyg.surface.Surface):
 
     ghostX = pyg.mouse.get_pos()[0] # 虚影左上角x坐标
     ghostX -= ghostWidth//2
-    ghostX = max(setting.sandArea.left, ghostX)
-    ghostX = min(setting.sandArea.right-ghostWidth, ghostX)
+    ghostX -= setting.sandPos[0]
+    ghostX = max(0, ghostX)
+    ghostX = min(setting.sandArea.get_width()-ghostWidth, ghostX)
     ghostX -= ghostX%setting.sandSize
 
     ghost = curShape.l
@@ -66,9 +72,9 @@ def renderGhost(screen: pyg.surface.Surface):
             if ghost[i][j]:
                 rectPos = (
                     ghostX + i*setting.sandSize*setting.blockSize,
-                    setting.sandArea.top + j*setting.sandSize*setting.blockSize
+                    j*setting.sandSize*setting.blockSize
                 )
-                screen.blit(rect, rectPos)
+                setting.sandArea.blit(rect, rectPos)
 
 def render(screen: pyg.surface.Surface):
     """
@@ -83,9 +89,11 @@ def render(screen: pyg.surface.Surface):
         if setting.needToQuit:
             return # 退出线程
         
+        flipAllAreas()
         renderBackground(screen)
-        renderSand(screen)
-        renderGhost(screen)
+        renderSand()
+        renderGhost()
+        screen.blit(setting.sandArea, setting.sandPos)
 
         pyg.display.flip()
         renderClock.tick(setting.fps)
