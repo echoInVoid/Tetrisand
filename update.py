@@ -1,5 +1,6 @@
 import pygame as pyg
 from random import choice
+from render import refreshColorHint
 
 from sand import *
 from settings import setting
@@ -41,6 +42,7 @@ def putSand():
                 sands[x+i][j] = choice((SANDS_DARK[status.curType], SANDS_LIGHT[status.curType]))
     
     status.nextPlacement()
+    refreshColorHint()
 
 def update():
     """

@@ -7,11 +7,18 @@ from sand import *
 renderClock = pyg.time.Clock()
 
 bgSign = 0 # 随帧变化，决定背景图片的移动
+colorHintMove = 0 # 随帧变化，决定颜色提示的移动
+colorHintY = -20
+
+def refreshColorHint():
+    global colorHintMove
+    colorHintMove = setting.fps
 
 def flipAllAreas():
     setting.sandArea.fill("#000000")
     setting.infoArea.fill("#FFFFFF")
     setting.shapeArea.fill("#000000")
+    setting.colorArea.fill("#000000")
 
 def renderBackground(screen: pyg.surface.Surface):
     """渲染游戏背景"""
@@ -76,6 +83,42 @@ def renderGhost():
                 )
                 setting.sandArea.blit(rect, rectPos)
 
+def renderColorHint():
+    """渲染放置色彩提示"""
+    global colorHintMove, colorHintY
+    if colorHintMove:
+        colorHintY -= 108/setting.fps
+        image1 = status.prevImage
+        image2 = status.curImage
+        image3 = status.nextImage
+        setting.colorArea.blit(image3, (0,colorHintY+108+108))
+        setting.colorArea.blit(image2, (0,colorHintY+108))
+        setting.colorArea.blit(image1, (0,colorHintY))
+    else:
+        colorHintY = -20
+        image1 = status.curImage
+        image2 = status.nextImage
+        setting.colorArea.blit(image2, (0,colorHintY+108))
+        setting.colorArea.blit(image1, (0,colorHintY))
+
+    colorHintMove = max(0, colorHintMove-1)
+    
+def renderShapeHint():
+    """渲染放置形状提示"""
+    curShape = status.curShape
+    width = len(curShape.l)*setting.hintBlockSize
+    height = len(curShape.l[0])*setting.hintBlockSize
+    x = setting.shapeArea.get_width()//2 - width//2
+    y = setting.shapeArea.get_height()//2 - height//2
+    for i in range(len(curShape.l)):
+        for j in range(len(curShape.l[0])):
+            if curShape.l[i][j]:
+                block = pyg.rect.Rect(
+                    x+setting.hintBlockSize*i, y+setting.hintBlockSize*j,
+                    setting.hintBlockSize, setting.hintBlockSize
+                )
+                pyg.draw.rect(setting.shapeArea, "#FFFFFF", block)
+
 def render(screen: pyg.surface.Surface):
     """
     主渲染器，负责将游戏中的一切渲染到屏幕上
@@ -93,7 +136,11 @@ def render(screen: pyg.surface.Surface):
         renderBackground(screen)
         renderSand()
         renderGhost()
+        renderColorHint()
+        renderShapeHint()
         screen.blit(setting.sandArea, setting.sandPos)
+        screen.blit(setting.colorArea, setting.colorPos)
+        screen.blit(setting.shapeArea, setting.shapePos)
 
         pyg.display.flip()
         renderClock.tick(setting.fps)

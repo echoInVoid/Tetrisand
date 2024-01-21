@@ -24,6 +24,7 @@ class Setting:
         self.sandSize = 4 # 单颗沙粒的边长
         self.sandListSize = (self.sandArea.get_width()//self.sandSize, self.sandArea.get_height()//self.sandSize) # 沙粒列表的尺寸
         self.blockSize = 10 # 一个块的边长，单位是沙粒
+        self.hintBlockSize = 6*self.sandSize # 提示区方块的边长，单位像素
 
         self.fps = 30
         self.tps = 20
