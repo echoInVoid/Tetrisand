@@ -1,4 +1,5 @@
 from random import choice, randint
+from settings import setting
 from shape import SHAPES
 from sand import SANDS_LIGHT
 from pygame.image import load
@@ -18,6 +19,8 @@ class Status:
         self.placeSand = False # 如果为True，在下一tick放置沙子
         self.placeCD = 0 # 剩余放置冷却时间
 
+        self.pausedByRemoving = 0 # 剩余暂停时间
+
         self.nextPlacement()
     
     def nextPlacement(self):
@@ -33,5 +36,8 @@ class Status:
 
         self.nextType = randint(0, len(SANDS_LIGHT)-1)
         self.nextImage = load(".\\res\\sand\\%d.png"%self.nextType)
+    
+    def pauseBecauseRemoving(self):
+        self.pausedByRemoving = setting.removePauseTime
 
 status = Status()

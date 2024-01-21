@@ -1,7 +1,8 @@
+from copy import copy
 import pygame as pyg
 from random import choice
-from render import refreshColorHint
 
+from render import refreshColorHint
 from sand import *
 from settings import setting
 from status import status
@@ -13,7 +14,9 @@ def updateSand():
     for y in reversed(range(setting.sandListSize[1]-1)): # 从下往上更新沙子，最下一行无需更新
         for x in range(setting.sandListSize[0]):
             # 尝试让沙子下落
-            if sands[x][y+1]==VOID:
+            if sands[x][y] == VOID or sands[x][y]==REMOVING:
+                continue
+            if sands[x][y+1] == VOID:
                 sands[x][y], sands[x][y+1] = sands[x][y+1], sands[x][y]
             elif x!=setting.sandListSize[0]-1 and sands[x+1][y+1]==VOID:
                 sands[x][y], sands[x+1][y+1] = sands[x+1][y+1], sands[x][y]
@@ -39,10 +42,86 @@ def putSand():
     for i in range(width):
         for j in range(height):
             if placement[i][j]:
-                sands[x+i][j] = choice((SANDS_DARK[status.curType], SANDS_LIGHT[status.curType]))
+                sands[x+i][j] = copy(choice((SANDS_DARK[status.curType], SANDS_LIGHT[status.curType])))
     
     status.nextPlacement()
     refreshColorHint()
+
+def markSand() -> bool:
+    """标记接触左右两边的连片沙子"""
+
+    # BFS
+    sandRemoving = [] # 需要移除的标记
+    mark = [[-1]*setting.sandListSize[1] for _ in range(setting.sandListSize[0])]
+    for j in range(setting.sandListSize[1]):
+        if sands[0][j] != VOID and sands[0][j] != REMOVING:
+            if BFSMark(0, j, mark, j):
+                sandRemoving.append(j)
+    
+    if len(sandRemoving) == 0:
+        return False
+    
+    # 让被标记的沙子被渲染成白色
+    for i in range(setting.sandListSize[0]):
+        for j in range(setting.sandListSize[1]):
+            if mark[i][j] in sandRemoving:
+                sands[i][j] = copy(REMOVING)
+
+    return True
+
+def removeMarkedSand():
+    """移除标记的沙子"""
+    for i in range(setting.sandListSize[0]):
+        for j in range(setting.sandListSize[1]):
+            if sands[i][j] == REMOVING:
+                sands[i][j] = copy(VOID)
+
+def BFSMark(x: int, y: int, mark: 'list[list[bool]]', marker: int) -> bool:
+    """从(x,y)开始寻找同时接触左右边界的沙子区域，并标记为marker。返回是否有同时接触左右边界的沙子区域"""
+    if mark[x][y] != -1:
+        return False
+    
+    queue = [(x, y)]
+    mark[x][y] = marker
+    head = 0
+    res = False
+    while (head<len(queue)):
+        curX, curY = queue[head]
+        head += 1
+
+        if curX == setting.sandListSize[0]-1:
+            res = True
+
+        if (
+            curX-1>=0 and 
+            mark[curX-1][curY]==-1 and
+            sands[curX][curY]==sands[curX-1][curY]
+        ):
+            mark[curX-1][curY] = marker
+            queue.append((curX-1, curY))
+        if (
+            curY-1>=0 and
+            mark[curX][curY-1]==-1 and
+            sands[curX][curY]==sands[curX][curY-1]
+        ):
+            mark[curX][curY-1] = marker
+            queue.append((curX, curY-1))
+        if (
+            curX+1<len(sands) and
+            mark[curX+1][curY]==-1 and
+            sands[curX][curY]==sands[curX+1][curY]
+        ):
+            mark[curX+1][curY] = marker
+            queue.append((curX+1, curY))
+        if (
+            curY+1<len(sands[0]) and
+            mark[curX][curY+1]==-1 and
+            sands[curX][curY]==sands[curX][curY+1]
+        ):
+            mark[curX][curY+1] = marker
+            queue.append((curX, curY+1))
+    
+    return res
 
 def update():
     """
@@ -57,6 +136,12 @@ def update():
         if setting.needToQuit:
             return # 退出线程
         
+        updateClock.tick(setting.tps)
+
+        if status.pausedByRemoving:
+            status.pausedByRemoving -= 1
+            continue
+
         sandsLock.acquire() # 为 sands 加锁
 
         if status.placeSand and status.placeCD==0:
@@ -65,9 +150,15 @@ def update():
         status.placeSand = False
 
         updateSand()
-        status.placeCD -= 1
-        status.placeCD = max(status.placeCD, 0)
+        
+        if markSand():
+            status.pauseBecauseRemoving()
+            sandsLock.release()
+            continue
+
+        removeMarkedSand()
 
         sandsLock.release() # 释放锁
 
-        updateClock.tick(setting.tps)
+        status.placeCD -= 1
+        status.placeCD = max(status.placeCD, 0)

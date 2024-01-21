@@ -29,6 +29,7 @@ class Setting:
         self.fps = 30
         self.tps = 20
         self.placeCD = self.tps # 两次放置之间的冷却时间
+        self.removePauseTime = self.tps # 移除沙子时的暂停时间
 
         self.needToQuit = False
 
