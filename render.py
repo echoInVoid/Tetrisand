@@ -28,7 +28,7 @@ def renderBackground(screen: pyg.surface.Surface):
     bgSign %= 25
     screen.blit(setting.bgImage, (-bgSign, -bgSign))
     screen.blit(setting.coverImage, (0, 0))
-    screen.set_colorkey()
+    screen.set_colorkey("#00000000")
 
 def renderSand():
     """渲染沙子"""
@@ -119,6 +119,22 @@ def renderShapeHint():
                 )
                 pyg.draw.rect(setting.shapeArea, "#FFFFFF", block)
 
+def renderInfoBoard():
+    """渲染屏幕上方信息栏"""
+    renderLogo()
+    
+    text1 = "%08d"%status.score
+    text2 = "%08d"%status.highScore
+    surf1 = setting.renderFont.render(text1, False, "#000000")
+    surf2 = setting.renderFont.render(text2, False, "#000000")
+    fontX = setting.infoArea.get_width()-surf1.get_width()
+    fontY = setting.infoArea.get_height()/2 - surf1.get_height()+5
+    setting.infoArea.blit(surf1, (fontX, fontY))
+    setting.infoArea.blit(surf2, (fontX, fontY+surf1.get_height()))
+
+def renderLogo():
+    setting.infoArea.blit(setting.logoImage, (0,0))
+
 def render(screen: pyg.surface.Surface):
     """
     主渲染器，负责将游戏中的一切渲染到屏幕上
@@ -138,9 +154,11 @@ def render(screen: pyg.surface.Surface):
         renderGhost()
         renderColorHint()
         renderShapeHint()
+        renderInfoBoard()
         screen.blit(setting.sandArea, setting.sandPos)
         screen.blit(setting.colorArea, setting.colorPos)
         screen.blit(setting.shapeArea, setting.shapePos)
+        screen.blit(setting.infoArea, setting.infoPos)
 
         pyg.display.flip()
         renderClock.tick(setting.fps)

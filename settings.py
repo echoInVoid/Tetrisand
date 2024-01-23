@@ -7,6 +7,8 @@ class Setting:
 
         self.bgImage = pyg.image.load(".\\res\\bg.png")
         self.coverImage = pyg.image.load(".\\res\\cover.png")
+        self.logoImage = pyg.image.load(".\\res\\logo.png")
+        self.renderFont = pyg.font.Font("res\\HighPixel.ttf", 40)
 
         # 屏幕最上方的计分板
         self.infoArea = pyg.surface.Surface((504,112))
@@ -33,4 +35,5 @@ class Setting:
 
         self.needToQuit = False
 
+pyg.init()
 setting = Setting()

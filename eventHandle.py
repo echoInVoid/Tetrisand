@@ -6,6 +6,8 @@ def eventHandler():
     """处理所有收到的事件"""
     for event in pyg.event.get():
         if event.type == pyg.QUIT:
+            status.saveHighScore()
+            
             # 命令所有线程退出
             setting.needToQuit = True
 

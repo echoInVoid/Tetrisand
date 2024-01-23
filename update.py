@@ -71,14 +71,17 @@ def replaceMarkedSand(sandRemoving: 'list[int]', mark: 'list[list[int]]'):
             if mark[i][j] in sandRemoving:
                 sands[i][j] = REMOVING
 
-def removeMarkedSand():
-    """移除标记的沙子"""
+def removeMarkedSand() -> int:
+    """移除标记的沙子，返回移除的沙子数"""
+    cnt = 0
     for i in range(setting.sandListSize[0]):
         for j in range(setting.sandListSize[1]):
             if sands[i][j] == REMOVING:
                 sands[i][j] = VOID
+                cnt += 1
+    return cnt
 
-def BFSMark(x: int, y: int, mark: 'list[list[bool]]', marker: int) -> bool:
+def BFSMark(x: int, y: int, mark: 'list[list[int]]', marker: int) -> bool:
     """从(x,y)开始寻找同时接触左右边界的沙子区域，并标记为marker。返回是否有同时接触左右边界的沙子区域"""
     if mark[x][y] != -1:
         return False
@@ -158,7 +161,7 @@ def update():
             sandsLock.release()
             continue
 
-        removeMarkedSand()
+        status.addScore(removeMarkedSand())
 
         sandsLock.release() # 释放锁
 

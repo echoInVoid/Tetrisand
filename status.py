@@ -21,7 +21,31 @@ class Status:
 
         self.pausedByRemoving = 0 # 剩余暂停时间
 
+        self.score = 0 # 当前得分
+        self.highScore = self.__getHighScore() # 最高分
+
         self.nextPlacement()
+
+    def __getHighScore(self) -> int:
+        """从文件读取最高分"""
+        try:
+            with open("score.txt", "r") as f:
+                return int(f.read())
+        except Exception as e:
+            print("Error: Failed to get high score:", str(e)) #TODO: 这里也许需要一个更成熟的日志方式
+            return 0
+    
+    def addScore(self, score: int):
+        self.score += score
+        self.highScore = max(self.highScore, self.score)
+    
+    def saveHighScore(self):
+        """将分数存储到文件"""
+        try:
+            with open("score.txt", "w") as f:
+                f.write(str(self.highScore))
+        except Exception as e:
+            print("Error: Failed to save high score:", str(e)) #TODO: 这里也许需要一个更成熟的日志方式
     
     def nextPlacement(self):
         """随机选取下次要放置的沙子形状与颜色"""
