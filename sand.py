@@ -1,4 +1,3 @@
-from copy import copy
 from threading import Lock
 from pygame.color import Color
 
@@ -34,7 +33,7 @@ REMOVING = Sand(4, "#FFFFFF") # 即将被删除
 SANDS_LIGHT = (SAND_RED1, SAND_YELLOW1, SAND_GREEN1, SAND_BLUE1)
 SANDS_DARK = (SAND_RED2, SAND_YELLOW2, SAND_GREEN2, SAND_BLUE2)
 
-sands = [ [ copy(VOID) for i in range(setting.sandListSize[1]) ]
+sands = [ [ VOID for i in range(setting.sandListSize[1]) ]
          for j in range(setting.sandListSize[0]) ]
 
 sandsLock = Lock()

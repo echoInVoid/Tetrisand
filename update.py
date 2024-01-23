@@ -1,4 +1,3 @@
-from copy import copy
 import pygame as pyg
 from random import choice
 
@@ -42,7 +41,7 @@ def putSand():
     for i in range(width):
         for j in range(height):
             if placement[i][j]:
-                sands[x+i][j] = copy(choice((SANDS_DARK[status.curType], SANDS_LIGHT[status.curType])))
+                sands[x+i][j] = choice((SANDS_DARK[status.curType], SANDS_LIGHT[status.curType]))
     
     status.nextPlacement()
     refreshColorHint()
@@ -61,20 +60,23 @@ def markSand() -> bool:
     if len(sandRemoving) == 0:
         return False
     
-    # 让被标记的沙子被渲染成白色
+    replaceMarkedSand(sandRemoving, mark)
+
+    return True
+
+def replaceMarkedSand(sandRemoving: 'list[int]', mark: 'list[list[int]]'):
+    """让被标记的沙子被渲染成白色，即替换成REMOVING"""
     for i in range(setting.sandListSize[0]):
         for j in range(setting.sandListSize[1]):
             if mark[i][j] in sandRemoving:
-                sands[i][j] = copy(REMOVING)
-
-    return True
+                sands[i][j] = REMOVING
 
 def removeMarkedSand():
     """移除标记的沙子"""
     for i in range(setting.sandListSize[0]):
         for j in range(setting.sandListSize[1]):
             if sands[i][j] == REMOVING:
-                sands[i][j] = copy(VOID)
+                sands[i][j] = VOID
 
 def BFSMark(x: int, y: int, mark: 'list[list[bool]]', marker: int) -> bool:
     """从(x,y)开始寻找同时接触左右边界的沙子区域，并标记为marker。返回是否有同时接触左右边界的沙子区域"""
