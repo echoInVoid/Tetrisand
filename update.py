@@ -10,10 +10,10 @@ updateClock = pyg.time.Clock()
 
 def updateSand():
     """让沙子下落"""
-    for y in reversed(range(setting.sandListSize[1]-1)): # 从下往上更新沙子，最下一行无需更新
+    for y in range(setting.sandListSize[1]-2, -1, -1): # 从下往上更新沙子，最下一行无需更新
         for x in range(setting.sandListSize[0]):
             # 尝试让沙子下落
-            if sands[x][y] == VOID or sands[x][y]==REMOVING:
+            if not updatableSand(sands[x][y]):
                 continue
             if sands[x][y+1] == VOID:
                 sands[x][y], sands[x][y+1] = sands[x][y+1], sands[x][y]
@@ -53,7 +53,7 @@ def markSand() -> bool:
     sandRemoving = [] # 需要移除的标记
     mark = [[-1]*setting.sandListSize[1] for _ in range(setting.sandListSize[0])]
     for j in range(setting.sandListSize[1]):
-        if sands[0][j] != VOID and sands[0][j] != REMOVING:
+        if updatableSand(sands[0][j]):
             if BFSMark(0, j, mark, j):
                 sandRemoving.append(j)
     
@@ -96,35 +96,19 @@ def BFSMark(x: int, y: int, mark: 'list[list[int]]', marker: int) -> bool:
 
         if curX == setting.sandListSize[0]-1:
             res = True
-
-        if (
-            curX-1>=0 and 
-            mark[curX-1][curY]==-1 and
-            sands[curX][curY]==sands[curX-1][curY]
-        ):
-            mark[curX-1][curY] = marker
-            queue.append((curX-1, curY))
-        if (
-            curY-1>=0 and
-            mark[curX][curY-1]==-1 and
-            sands[curX][curY]==sands[curX][curY-1]
-        ):
-            mark[curX][curY-1] = marker
-            queue.append((curX, curY-1))
-        if (
-            curX+1<len(sands) and
-            mark[curX+1][curY]==-1 and
-            sands[curX][curY]==sands[curX+1][curY]
-        ):
-            mark[curX+1][curY] = marker
-            queue.append((curX+1, curY))
-        if (
-            curY+1<len(sands[0]) and
-            mark[curX][curY+1]==-1 and
-            sands[curX][curY]==sands[curX][curY+1]
-        ):
-            mark[curX][curY+1] = marker
-            queue.append((curX, curY+1))
+        
+        for dx in (-1,1):
+            if validPos(curX+dx, curY):
+                if mark[curX+dx][curY] == -1:
+                    if sands[curX][curY] == sands[curX+dx][curY]:
+                        mark[curX+dx][curY] = marker
+                        queue.append((curX+dx, curY))
+        for dy in (-1,1):
+            if validPos(curX, curY+dy):
+                if mark[curX][curY+dy] == -1:
+                    if sands[curX][curY] == sands[curX][curY+dy]:
+                        mark[curX][curY+dy] = marker
+                        queue.append((curX, curY+dy))
     
     return res
 

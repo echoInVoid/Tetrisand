@@ -37,3 +37,15 @@ sands = [ [ VOID for i in range(setting.sandListSize[1]) ]
          for j in range(setting.sandListSize[0]) ]
 
 sandsLock = Lock()
+
+def updatableSand(s:Sand) -> bool:
+    return s != VOID and s != REMOVING
+
+def validPos(x:int, y:int) -> bool:
+    """验证(x,y)是否在sands内"""
+    return (
+        x >= 0 and
+        x < setting.sandListSize[0] and
+        y >= 0 and
+        y < setting.sandListSize[1]
+    )
