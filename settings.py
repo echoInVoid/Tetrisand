@@ -28,12 +28,12 @@ class Setting:
         self.blockSize = 10 # 一个块的边长，单位是沙粒
         self.hintBlockSize = 6*self.sandSize # 提示区方块的边长，单位像素
 
+        self.failLine = int(self.sandListSize[1]*0.1) # 如果沙子高度超过这里，判定游戏结束
+
         self.fps = 30
         self.tps = 20
         self.placeCD = self.tps # 两次放置之间的冷却时间
         self.removePauseTime = self.tps # 移除沙子时的暂停时间
-
-        self.needToQuit = False
 
 pyg.init()
 setting = Setting()

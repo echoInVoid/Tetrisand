@@ -22,6 +22,15 @@ def updateSand():
             elif x!=0 and sands[x-1][y+1]==VOID:
                 sands[x][y], sands[x-1][y+1] = sands[x-1][y+1], sands[x][y]
 
+def checkForFailing():
+    """检查是否有沙子到达高度上限，如果有，结束游戏"""
+    for x in range(setting.sandListSize[0]):
+        for y in range(setting.sandListSize[1]-1, setting.failLine-1, -1):
+            if y<=setting.failLine and updatableSand(sands[x][y]):
+                status.fail = True
+            if not updatableSand(sands[x][y]):
+                break
+
 def putSand():
     """放置沙子"""
     curShape = status.curShape
@@ -122,10 +131,13 @@ def update():
     # 更新循环
     while True:
         # 检查线程退出标志
-        if setting.needToQuit:
+        if status.needToQuit:
             return # 退出线程
         
         updateClock.tick(setting.tps)
+
+        if status.fail:
+            continue
 
         if status.pausedByRemoving:
             status.pausedByRemoving -= 1
@@ -148,6 +160,8 @@ def update():
         status.addScore(removeMarkedSand())
 
         sandsLock.release() # 释放锁
+
+        checkForFailing()
 
         status.placeCD -= 1
         status.placeCD = max(status.placeCD, 0)

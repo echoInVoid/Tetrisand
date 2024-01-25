@@ -49,3 +49,9 @@ def validPos(x:int, y:int) -> bool:
         y >= 0 and
         y < setting.sandListSize[1]
     )
+
+def resetSand():
+    global sands
+    for i in range(setting.sandListSize[0]):
+        for j in range(setting.sandListSize[1]):
+            sands[i][j] = VOID

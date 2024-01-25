@@ -13,7 +13,7 @@ class Status:
 
         # 用于提示玩家沙子颜色
         self.prevImage = load(".\\res\\sand\\0.png")
-        self.curImage = load(".\\res\\sand\\0.png")
+        self.curImage = load(".\\res\\sand\\0.png") # type: ignore
         self.nextImage = load(".\\res\\sand\\0.png")
 
         self.placeSand = False # 如果为True，在下一tick放置沙子
@@ -23,6 +23,9 @@ class Status:
 
         self.score = 0 # 当前得分
         self.highScore = self.__getHighScore() # 最高分
+
+        self.fail = False # 当前游戏是否失败
+        self.needToQuit = False # 是否需要退出游戏
 
         self.nextPlacement()
 
@@ -63,5 +66,9 @@ class Status:
     
     def pauseBecauseRemoving(self):
         self.pausedByRemoving = setting.removePauseTime
+
+def resetStatus():
+    global status
+    status.__init__()
 
 status = Status()

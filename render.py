@@ -22,11 +22,13 @@ def flipAllAreas():
 
 def renderBackground(screen: pyg.surface.Surface):
     """渲染游戏背景"""
-
     global bgSign
     bgSign += 0.2
     bgSign %= 25
     screen.blit(setting.bgImage, (-bgSign, -bgSign))
+
+def renderCover(screen: pyg.surface.Surface):
+    """渲染框架"""
     screen.blit(setting.coverImage, (0, 0))
     screen.set_colorkey("#00000000")
 
@@ -135,6 +137,59 @@ def renderInfoBoard():
 def renderLogo():
     setting.infoArea.blit(setting.logoImage, (0,0))
 
+def renderFailLine():
+    """渲染失败提示线"""
+    failLineY = setting.failLine*setting.sandSize
+    pyg.draw.line(
+        setting.sandArea,
+        "#9C0000",
+        (0, failLineY),
+        (setting.sandArea.get_width()-1, failLineY),
+        setting.sandSize
+    )
+
+def renderFailScreen(screen: pyg.surface.Surface):
+    renderBanner(screen)
+    renderScore(screen)
+    renderHint(screen)
+
+def renderHint(screen: pyg.surface.Surface):
+    font = pyg.font.Font("res\\HighPixel.ttf", 30)
+    hint = font.render("Press any key to restart.", False, "#000000")
+    y = int(screen.get_height()//2.5*1.7)
+    w = hint.get_width()
+    h = hint.get_height()
+    scrW = screen.get_width()
+    screen.blit(hint, ( (scrW-w)/2, y-h/2 ))
+
+def renderScore(screen: pyg.surface.Surface):
+    font = pyg.font.Font("res\\HighPixel.ttf", 40)
+    score = font.render("SCORE: %08d"%status.score, False, "#000000")
+    highScore = font.render("HIGH:  %08d"%status.highScore, False, "#000000")
+    
+    y = screen.get_height()//2.5
+    w = score.get_width()
+    h = score.get_height()
+    scrW = screen.get_width()
+
+    screen.blit(score, ( (scrW-w)/2, y-h/2 ))
+    screen.blit(highScore, ((scrW-w)/2, y-h/2+h))
+
+    if status.score == status.highScore:
+        newRecord = font.render("New record!", False, "#000000")
+        screen.blit(newRecord, ((scrW-w)/2, y-h/2+h+h))
+
+def renderBanner(screen: pyg.surface.Surface):
+    bannerFont = pyg.font.Font("res\\HighPixel.ttf", 72)
+    banner = bannerFont.render("Game Over", False, "#000000")
+    screen.blit(
+        banner,
+        (
+            (screen.get_width()-banner.get_width()) / 2,
+            screen.get_height()/4 - banner.get_height()/2
+        )
+    )
+
 def render(screen: pyg.surface.Surface):
     """
     主渲染器，负责将游戏中的一切渲染到屏幕上
@@ -145,20 +200,26 @@ def render(screen: pyg.surface.Surface):
     # 渲染循环
     while True:
         # 检查线程退出标志
-        if setting.needToQuit:
+        if status.needToQuit:
             return # 退出线程
         
         flipAllAreas()
         renderBackground(screen)
-        renderSand()
-        renderGhost()
-        renderColorHint()
-        renderShapeHint()
-        renderInfoBoard()
-        screen.blit(setting.sandArea, setting.sandPos)
-        screen.blit(setting.colorArea, setting.colorPos)
-        screen.blit(setting.shapeArea, setting.shapePos)
-        screen.blit(setting.infoArea, setting.infoPos)
+        
+        if status.fail:
+            renderFailScreen(screen)
+        else:
+            renderCover(screen)
+            renderSand()
+            renderGhost()
+            renderColorHint()
+            renderShapeHint()
+            renderInfoBoard()
+            renderFailLine()
+            screen.blit(setting.sandArea, setting.sandPos)
+            screen.blit(setting.colorArea, setting.colorPos)
+            screen.blit(setting.shapeArea, setting.shapePos)
+            screen.blit(setting.infoArea, setting.infoPos)
 
         pyg.display.flip()
         renderClock.tick(setting.fps)

@@ -7,6 +7,7 @@ from render import render
 from update import update
 from eventHandle import eventHandler
 from settings import setting
+from status import status
 
 
 def main():
@@ -28,7 +29,7 @@ def main():
         eventHandler()
         
         # 退出
-        if setting.needToQuit:
+        if status.needToQuit:
             break
     
     pyg.quit()
