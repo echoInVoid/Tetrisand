@@ -1,3 +1,4 @@
+from audioop import reverse
 from settings import setting
 
 class Shape:
@@ -9,24 +10,34 @@ class Shape:
     
     def extend(self) -> 'list[list[bool]]':
         """将这个形状展开成可用于放置沙子的列表"""
-        width = len(self.l) * setting.blockSize
-        height = len(self.l[0]) * setting.blockSize
-        result = [[None for j in range(height)] for i in range(width)]
-
-        for i in range(width):
-            for j in range(height):
-                result[i][j] = self.l[i//setting.blockSize][j//setting.blockSize]
+        sz = setting.blockSize
+        w = len(self.l) * sz
+        h = len(self.l[0]) * sz
+        result = [ [self.l[i//sz][j//sz] for j in range(h)] for i in range(w) ]
         
         return result
 
-    def rotate(self) -> None:
+    def leftRotate(self) -> None:
         """顺时针旋转自身"""
-        rows = len(self.l)
-        cols = len(self.l[0])
-        tmp = [[False]*rows for _ in range(cols)]
-        for i in range(rows):
-            for j in range(cols):
-                tmp[j][rows-i-1] = self.l[i][j]
+        # rows = len(self.l)
+        # cols = len(self.l[0])
+        # for i in range(rows):
+        #     for j in range(cols):
+        #         tmp[j][i] = self.l[rows-i-1][j]
+        # self.l = tmp
+        self.rightRotate()
+        self.rightRotate()
+        self.rightRotate()
+    
+    def rightRotate(self) -> None:
+        """逆时针旋转自身"""
+        w = len(self.l)
+        h = len(self.l[0])
+        tmp = [[False]*w for _ in range(h)]
+        for i in range(w):
+            self.l[i].reverse()
+            for j in range(h):
+                tmp[j][i] = self.l[i][j]
         self.l = tmp
 
 SHAPE1 = Shape("10\n10\n11") # L

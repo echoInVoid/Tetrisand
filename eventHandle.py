@@ -19,11 +19,9 @@ def eventHandler():
                 resetSand()
             # 旋转当前形状
             if event.key == pyg.K_RIGHT:
-                status.curShape.rotate()
+                status.curShape.leftRotate()
             elif event.key == pyg.K_LEFT:
-                status.curShape.rotate()
-                status.curShape.rotate()
-                status.curShape.rotate()
+                status.curShape.rightRotate()
         
         if event.type == pyg.MOUSEBUTTONDOWN:
             # 放置沙子

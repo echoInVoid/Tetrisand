@@ -54,7 +54,7 @@ class Status:
         """随机选取下次要放置的沙子形状与颜色"""
         self.curShape = choice(SHAPES)
         for i in range(randint(0,3)): # 随机旋转下一个形状
-            self.curShape.rotate()
+            self.curShape.leftRotate()
         
         self.prevImage = self.curImage
 
