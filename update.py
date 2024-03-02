@@ -27,13 +27,13 @@ def checkForFailing():
     for x in range(setting.sandListSize[0]):
         for y in range(setting.sandListSize[1]-1, setting.failLine-1, -1):
             if y<=setting.failLine and updatableSand(sands[x][y]):
-                status.fail = True
+                status.game.fail = True
             if not updatableSand(sands[x][y]):
                 break
 
 def putSand():
     """放置沙子"""
-    curShape = status.curShape
+    curShape = status.sand.curShape
     placement = curShape.extend()
     width = len(placement)
     height = len(placement[0])
@@ -50,7 +50,7 @@ def putSand():
     for i in range(width):
         for j in range(height):
             if placement[i][j]:
-                sands[x+i][j] = choice((SANDS_DARK[status.curType], SANDS_LIGHT[status.curType]))
+                sands[x+i][j] = choice((SANDS_DARK[status.sand.curType], SANDS_LIGHT[status.sand.curType]))
     
     status.nextPlacement()
     refreshColorHint()
@@ -131,37 +131,37 @@ def update():
     # 更新循环
     while True:
         # 检查线程退出标志
-        if status.needToQuit:
+        if status.game.needToQuit:
             return # 退出线程
         
         updateClock.tick(setting.tps)
 
-        if status.fail:
+        if status.game.fail:
             continue
 
-        if status.pausedByRemoving:
-            status.pausedByRemoving -= 1
+        if status.game.pausedTime:
+            status.game.pausedTime -= 1
             continue
 
         sandsLock.acquire() # 为 sands 加锁
 
-        if status.placeSand and status.placeCD==0:
+        if status.sand.placeSand and status.sand.placeCD==0:
             putSand()
-            status.placeCD = setting.placeCD
-        status.placeSand = False
+            status.sand.placeCD = setting.placeCD
+        status.sand.placeSand = False
 
         updateSand()
         
         if markSand():
-            status.pauseBecauseRemoving()
+            status.game.pauseByRemoving()
             sandsLock.release()
             continue
 
-        status.addScore(removeMarkedSand())
+        status.game.addScore(removeMarkedSand())
 
         sandsLock.release() # 释放锁
 
         checkForFailing()
 
-        status.placeCD -= 1
-        status.placeCD = max(status.placeCD, 0)
+        status.sand.placeCD -= 1
+        status.sand.placeCD = max(status.sand.placeCD, 0)

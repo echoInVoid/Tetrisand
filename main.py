@@ -29,7 +29,7 @@ def main():
         eventHandler()
         
         # 退出
-        if status.needToQuit:
+        if status.game.needToQuit:
             break
     
     pyg.quit()

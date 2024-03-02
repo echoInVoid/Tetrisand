@@ -56,7 +56,7 @@ def renderSand():
 def renderGhost():
     """渲染提示虚影"""
 
-    curShape = status.curShape
+    curShape = status.sand.curShape
     ghostWidth = len(curShape.l)*setting.blockSize*setting.sandSize
 
     ghostX = pyg.mouse.get_pos()[0] # 虚影左上角x坐标
@@ -67,8 +67,8 @@ def renderGhost():
     ghostX -= ghostX%setting.sandSize
 
     ghost = curShape.l
-    ghostColor:pyg.color.Color = SANDS_LIGHT[status.curType].color
-    ghostColor.a = int(128 * (1 - status.placeCD/setting.placeCD)) # 让虚影随着CD减少逐渐变得不透明
+    ghostColor:pyg.color.Color = SANDS_LIGHT[status.sand.curType].color
+    ghostColor.a = int(128 * (1 - status.sand.placeCD/setting.placeCD)) # 让虚影随着CD减少逐渐变得不透明
 
     rect = pyg.Surface(
             (setting.sandSize*setting.blockSize, setting.sandSize*setting.blockSize),
@@ -90,16 +90,16 @@ def renderColorHint():
     global colorHintMove, colorHintY
     if colorHintMove:
         colorHintY -= 108/setting.fps
-        image1 = status.prevImage
-        image2 = status.curImage
-        image3 = status.nextImage
+        image1 = status.render.prevImage
+        image2 = status.render.curImage
+        image3 = status.render.nextImage
         setting.colorArea.blit(image3, (0,colorHintY+108+108))
         setting.colorArea.blit(image2, (0,colorHintY+108))
         setting.colorArea.blit(image1, (0,colorHintY))
     else:
         colorHintY = -20
-        image1 = status.curImage
-        image2 = status.nextImage
+        image1 = status.render.curImage
+        image2 = status.render.nextImage
         setting.colorArea.blit(image2, (0,colorHintY+108))
         setting.colorArea.blit(image1, (0,colorHintY))
 
@@ -107,7 +107,7 @@ def renderColorHint():
     
 def renderShapeHint():
     """渲染放置形状提示"""
-    curShape = status.curShape
+    curShape = status.sand.curShape
     width = len(curShape.l)*setting.hintBlockSize
     height = len(curShape.l[0])*setting.hintBlockSize
     x = setting.shapeArea.get_width()//2 - width//2
@@ -125,8 +125,8 @@ def renderInfoBoard():
     """渲染屏幕上方信息栏"""
     renderLogo()
     
-    text1 = "%08d"%status.score
-    text2 = "%08d"%status.highScore
+    text1 = "%08d"%status.game.score
+    text2 = "%08d"%status.game.highScore
     surf1 = setting.renderFont.render(text1, False, "#000000")
     surf2 = setting.renderFont.render(text2, False, "#000000")
     fontX = setting.infoArea.get_width()-surf1.get_width()
@@ -164,8 +164,8 @@ def renderHint(screen: pyg.surface.Surface):
 
 def renderScore(screen: pyg.surface.Surface):
     font = pyg.font.Font("res\\HighPixel.ttf", 40)
-    score = font.render("SCORE: %08d"%status.score, False, "#000000")
-    highScore = font.render("HIGH:  %08d"%status.highScore, False, "#000000")
+    score = font.render("SCORE: %08d"%status.game.score, False, "#000000")
+    highScore = font.render("HIGH:  %08d"%status.game.highScore, False, "#000000")
     
     y = screen.get_height()//2.5
     w = score.get_width()
@@ -175,7 +175,7 @@ def renderScore(screen: pyg.surface.Surface):
     screen.blit(score, ( (scrW-w)/2, y-h/2 ))
     screen.blit(highScore, ((scrW-w)/2, y-h/2+h))
 
-    if status.score == status.highScore:
+    if status.game.score == status.game.highScore:
         newRecord = font.render("New record!", False, "#000000")
         screen.blit(newRecord, ((scrW-w)/2, y-h/2+h+h))
 
@@ -200,13 +200,13 @@ def render(screen: pyg.surface.Surface):
     # 渲染循环
     while True:
         # 检查线程退出标志
-        if status.needToQuit:
+        if status.game.needToQuit:
             return # 退出线程
         
         flipAllAreas()
         renderBackground(screen)
         
-        if status.fail:
+        if status.game.fail:
             renderFailScreen(screen)
         else:
             renderCover(screen)
