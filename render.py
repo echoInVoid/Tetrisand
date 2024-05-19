@@ -1,3 +1,4 @@
+from math import cos, pi
 import pygame as pyg
 
 from settings import setting
@@ -95,7 +96,8 @@ def renderGhost():
 def renderColorHint():
     """渲染放置色彩提示"""
     if stat.colorHintMove:
-        stat.colorHintY -= int(108/setting.fps)
+        speedRate = cos(pi-stat.colorHintMove/setting.fps*pi)+1.1
+        stat.colorHintY -= int(108 / setting.fps * speedRate)
         image1 = status.render.prevImage
         image2 = status.render.curImage
         image3 = status.render.nextImage
