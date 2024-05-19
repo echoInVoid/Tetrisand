@@ -6,13 +6,22 @@ from sand import *
 
 renderClock = pyg.time.Clock()
 
-bgSign = 0 # 随帧变化，决定背景图片的移动
-colorHintMove = 0 # 随帧变化，决定颜色提示的移动
-colorHintY = -20
+class RenderStat:
+    """存储一些元素的控制信息"""
+    def __init__(self) -> None:
+        self.bgSign = 0 # 随帧变化，决定背景图片的移动
+        self.colorHintMove = 0 # 随帧变化，决定颜色提示的移动
+        self.colorHintY = -20 # 当前颜色提示的位置
+    
+    def updateBackground(self):
+        self.bgSign += 0.2
+        self.bgSign %= 25
 
-def refreshColorHint():
-    global colorHintMove
-    colorHintMove = setting.fps
+    def refreshColorHint(self):
+        self.colorHintMove = setting.fps
+
+stat = RenderStat()
+
 
 def flipAllAreas():
     setting.sandArea.fill("#000000")
@@ -22,10 +31,8 @@ def flipAllAreas():
 
 def renderBackground(screen: pyg.surface.Surface):
     """渲染游戏背景"""
-    global bgSign
-    bgSign += 0.2
-    bgSign %= 25
-    screen.blit(setting.bgImage, (-bgSign, -bgSign))
+    stat.updateBackground()
+    screen.blit(setting.bgImage, (-stat.bgSign, -stat.bgSign))
 
 def renderCover(screen: pyg.surface.Surface):
     """渲染框架"""
@@ -87,23 +94,22 @@ def renderGhost():
 
 def renderColorHint():
     """渲染放置色彩提示"""
-    global colorHintMove, colorHintY
-    if colorHintMove:
-        colorHintY -= 108/setting.fps
+    if stat.colorHintMove:
+        stat.colorHintY -= int(108/setting.fps)
         image1 = status.render.prevImage
         image2 = status.render.curImage
         image3 = status.render.nextImage
-        setting.colorArea.blit(image3, (0,colorHintY+108+108))
-        setting.colorArea.blit(image2, (0,colorHintY+108))
-        setting.colorArea.blit(image1, (0,colorHintY))
+        setting.colorArea.blit(image3, (0,stat.colorHintY+108+108))
+        setting.colorArea.blit(image2, (0,stat.colorHintY+108))
+        setting.colorArea.blit(image1, (0,stat.colorHintY))
     else:
-        colorHintY = -20
+        stat.colorHintY = -20
         image1 = status.render.curImage
         image2 = status.render.nextImage
-        setting.colorArea.blit(image2, (0,colorHintY+108))
-        setting.colorArea.blit(image1, (0,colorHintY))
+        setting.colorArea.blit(image2, (0,stat.colorHintY+108))
+        setting.colorArea.blit(image1, (0,stat.colorHintY))
 
-    colorHintMove = max(0, colorHintMove-1)
+    stat.colorHintMove = max(0, stat.colorHintMove-1)
     
 def renderShapeHint():
     """渲染放置形状提示"""

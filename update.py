@@ -1,7 +1,7 @@
 import pygame as pyg
 from random import choice
 
-from render import refreshColorHint
+from render import stat
 from sand import *
 from settings import setting
 from status import status
@@ -53,7 +53,7 @@ def putSand():
                 sands[x+i][j] = choice((SANDS_DARK[status.sand.curType], SANDS_LIGHT[status.sand.curType]))
     
     status.nextPlacement()
-    refreshColorHint()
+    stat.refreshColorHint()
 
 def markSand() -> bool:
     """标记接触左右两边的连片沙子"""
