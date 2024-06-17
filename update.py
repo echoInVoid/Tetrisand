@@ -48,6 +48,12 @@ def putSand():
     x -= setting.sandPos[0]
     x = x//setting.sandSize
 
+    # 防止与先前放下的沙粒重叠
+    for i in range(width):
+        for j in range(height):
+            if placement[i][j] and sands[x+i][j]!=VOID:
+                return
+
     for i in range(width):
         for j in range(height):
             if placement[i][j]:
