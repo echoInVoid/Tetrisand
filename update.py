@@ -28,6 +28,7 @@ def checkForFailing():
         for y in range(setting.sandListSize[1]-1, setting.failLine-1, -1):
             if y<=setting.failLine and updatableSand(sands[x][y]):
                 status.game.fail = True
+                return
             if not updatableSand(sands[x][y]):
                 break
 
@@ -62,7 +63,7 @@ def markSand() -> bool:
     sandRemoving = [] # 需要移除的标记
     mark = [[-1]*setting.sandListSize[1] for _ in range(setting.sandListSize[0])]
     for j in range(setting.sandListSize[1]):
-        if updatableSand(sands[0][j]):
+        if updatableSand(sands[0][j]) and mark[0][j]==-1:
             if BFSMark(0, j, mark, j):
                 sandRemoving.append(j)
     
@@ -92,10 +93,11 @@ def removeMarkedSand() -> int:
 
 def BFSMark(x: int, y: int, mark: 'list[list[int]]', marker: int) -> bool:
     """从(x,y)开始寻找同时接触左右边界的沙子区域，并标记为marker。返回是否有同时接触左右边界的沙子区域"""
-    if mark[x][y] != -1:
-        return False
+    # if mark[x][y] != -1:
+    #     return False
     
     queue = [(x, y)]
+    TYPE = sands[x][y].type
     mark[x][y] = marker
     head = 0
     res = False
@@ -106,16 +108,16 @@ def BFSMark(x: int, y: int, mark: 'list[list[int]]', marker: int) -> bool:
         if curX == setting.sandListSize[0]-1:
             res = True
         
-        for dx in (-1,1):
-            if validPos(curX+dx, curY):
+        for dx in (1,-1):
+            if curX+dx >= 0 and curX+dx < setting.sandListSize[0]:
                 if mark[curX+dx][curY] == -1:
-                    if sands[curX][curY] == sands[curX+dx][curY]:
+                    if TYPE == sands[curX+dx][curY].type:
                         mark[curX+dx][curY] = marker
                         queue.append((curX+dx, curY))
         for dy in (-1,1):
-            if validPos(curX, curY+dy):
+            if curY+dy >= 0 and curY+dy < setting.sandListSize[1]:
                 if mark[curX][curY+dy] == -1:
-                    if sands[curX][curY] == sands[curX][curY+dy]:
+                    if TYPE == sands[curX][curY+dy].type:
                         mark[curX][curY+dy] = marker
                         queue.append((curX, curY+dy))
     
@@ -140,6 +142,8 @@ def update():
             continue
 
         if status.game.pausedTime:
+            if (status.game.pausedTime == 1):
+                status.game.addScore(removeMarkedSand())
             status.game.pausedTime -= 1
             continue
 
@@ -156,8 +160,6 @@ def update():
             status.game.pauseByRemoving()
             sandsLock.release()
             continue
-
-        status.game.addScore(removeMarkedSand())
 
         sandsLock.release() # 释放锁
 
