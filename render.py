@@ -198,6 +198,18 @@ def renderBanner(screen: pyg.surface.Surface):
         )
     )
 
+def renderFPS(screen: pyg.surface.Surface):
+    """渲染FPS和TPS"""
+    from update import updateClock
+    font = pyg.font.Font("res\\HighPixel.ttf", 15)
+    fps = renderClock.get_fps()
+    tps = updateClock.get_fps()
+    text = font.render("FPS: %.2f  TPS:%.2f"%(fps, tps), True, "#000000")
+    screen.blit(
+        text,
+        (text.get_width()/50, screen.get_height()-text.get_height()*1.05)
+    )
+
 def render(screen: pyg.surface.Surface):
     """
     主渲染器，负责将游戏中的一切渲染到屏幕上
@@ -213,6 +225,7 @@ def render(screen: pyg.surface.Surface):
         
         flipAllAreas()
         renderBackground(screen)
+        renderFPS(screen)
         
         if status.game.fail:
             renderFailScreen(screen)
