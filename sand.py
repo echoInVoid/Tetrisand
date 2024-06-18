@@ -33,9 +33,6 @@ REMOVING = Sand(4, "#FFFFFF") # 即将被删除
 SANDS_LIGHT = (SAND_RED1, SAND_YELLOW1, SAND_GREEN1, SAND_BLUE1)
 SANDS_DARK = (SAND_RED2, SAND_YELLOW2, SAND_GREEN2, SAND_BLUE2)
 
-sands = [ [ VOID for i in range(setting.sandListSize[1]) ]
-         for j in range(setting.sandListSize[0]) ]
-
 sandsLock = Lock()
 
 def updatableSand(s:Sand) -> bool:
@@ -49,9 +46,3 @@ def validPos(x:int, y:int) -> bool:
         y >= 0 and
         y < setting.sandListSize[1]
     )
-
-def resetSand():
-    global sands
-    for i in range(setting.sandListSize[0]):
-        for j in range(setting.sandListSize[1]):
-            sands[i][j] = VOID

@@ -1,6 +1,6 @@
 import pygame as pyg
 from status import status
-from sand import resetSand
+from sandData import resetSand
 
 def eventHandler():
     """处理所有收到的事件"""

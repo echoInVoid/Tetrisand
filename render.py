@@ -1,6 +1,7 @@
 from math import cos, pi
 import pygame as pyg
 
+from sandData import sands
 from settings import setting
 from status import status
 from sand import *

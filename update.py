@@ -3,6 +3,7 @@ from random import choice
 
 from render import stat
 from sand import *
+from sandData import sands
 from settings import setting
 from status import status
 
