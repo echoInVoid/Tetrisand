@@ -170,21 +170,23 @@ def update():
             status.game.pausedTime -= 1
             continue
 
-        sandsLock.acquire() # 为 sands 加锁
+        # sandsLock.acquire() # 为 sands 加锁
 
         if status.sand.placeSand and status.sand.placeCD==0:
             putSand()
             status.sand.placeCD = setting.placeCD
         status.sand.placeSand = False
 
+        sandsLock.acquire()
         updateSand()
+        sandsLock.release()
         
         if markSand():
             status.game.pauseByRemoving()
-            sandsLock.release()
+            # sandsLock.release()
             continue
 
-        sandsLock.release() # 释放锁
+        # sandsLock.release() # 释放锁
 
         checkForFailing()
 

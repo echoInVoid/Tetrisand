@@ -44,7 +44,7 @@ def renderCover(screen: pyg.surface.Surface):
 def renderSand():
     """渲染沙子"""
     
-    sandsLock.acquire() # 为 sands 加锁
+    # sandsLock.acquire() # 为 sands 加锁
 
     for x in range(setting.sandListSize[0]):
         for y in range (setting.sandListSize[1]):
@@ -60,7 +60,7 @@ def renderSand():
                     )
                 )
     
-    sandsLock.release() # 释放锁
+    # sandsLock.release() # 释放锁
 
 def renderGhost():
     """渲染提示虚影"""
