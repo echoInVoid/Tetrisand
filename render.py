@@ -76,7 +76,7 @@ def renderGhost():
     ghostX -= ghostX%setting.sandSize
 
     ghost = curShape.l
-    ghostColor:pyg.color.Color = SANDS_LIGHT[status.sand.curType].color
+    ghostColor:pyg.color.Color = Color(SANDS_LIGHT[status.sand.curType].color)
     ghostColor.a = int(128 * (1 - status.sand.placeCD/setting.placeCD)) # 让虚影随着CD减少逐渐变得不透明
 
     rect = pyg.Surface(

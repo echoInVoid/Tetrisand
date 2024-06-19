@@ -6,10 +6,15 @@ from sand import *
 from sandData import sands
 from settings import setting
 from status import status
+import numpy as np
+cimport numpy as npc
+npc.import_array()
+
+ctypedef int _bool
 
 updateClock = pyg.time.Clock()
 
-def updateSand():
+cpdef updateSand():
     """让沙子下落"""
     for y in range(setting.sandListSize[1]-2, -1, -1): # 从下往上更新沙子，最下一行无需更新
         for x in range(setting.sandListSize[0]):
@@ -23,7 +28,7 @@ def updateSand():
             elif x!=0 and sands[x-1][y+1]==VOID:
                 sands[x][y], sands[x-1][y+1] = sands[x-1][y+1], sands[x][y]
 
-def checkForFailing():
+cpdef checkForFailing():
     """检查是否有沙子到达高度上限，如果有，结束游戏"""
     for x in range(setting.sandListSize[0]):
         for y in range(setting.sandListSize[1]-1, setting.failLine-1, -1):
@@ -33,7 +38,7 @@ def checkForFailing():
             if not updatableSand(sands[x][y]):
                 break
 
-def putSand():
+cpdef putSand():
     """放置沙子"""
     curShape = status.sand.curShape
     placement = curShape.extend()
@@ -63,12 +68,17 @@ def putSand():
     status.nextPlacement()
     stat.refreshColorHint()
 
-def markSand() -> bool:
+cdef _bool markSand():
     """标记接触左右两边的连片沙子"""
-
+    cdef list sandRemoving
+    cdef list[list[int]] mark
     # BFS
     sandRemoving = [] # 需要移除的标记
     mark = [[-1]*setting.sandListSize[1] for _ in range(setting.sandListSize[0])]
+    for i in range(setting.sandListSize[0]):
+        for j in range(setting.sandListSize[1]):
+            mark[i][j] = -1
+    
     for j in range(setting.sandListSize[1]):
         if updatableSand(sands[0][j]) and mark[0][j]==-1:
             if BFSMark(0, j, mark, j):
@@ -81,15 +91,17 @@ def markSand() -> bool:
 
     return True
 
-def replaceMarkedSand(sandRemoving: 'list[int]', mark: 'list[list[int]]'):
+cdef void replaceMarkedSand(list[int] sandRemoving, list[list[int]] mark):
     """让被标记的沙子被渲染成白色，即替换成REMOVING"""
+    cdef int i, j
     for i in range(setting.sandListSize[0]):
         for j in range(setting.sandListSize[1]):
             if mark[i][j] in sandRemoving:
                 sands[i][j] = REMOVING
 
-def removeMarkedSand() -> int:
+cdef int removeMarkedSand():
     """移除标记的沙子，返回移除的沙子数"""
+    cdef int i, j, cnt
     cnt = 0
     for i in range(setting.sandListSize[0]):
         for j in range(setting.sandListSize[1]):
@@ -98,18 +110,22 @@ def removeMarkedSand() -> int:
                 cnt += 1
     return cnt
 
-def BFSMark(x: int, y: int, mark: 'list[list[int]]', marker: int) -> bool:
+cdef _bool BFSMark(int x, int y, list[list[int]] mark, int marker):
     """从(x,y)开始寻找同时接触左右边界的沙子区域，并标记为marker。返回是否有同时接触左右边界的沙子区域"""
     # if mark[x][y] != -1:
     #     return False
     
-    queue = [(x, y)]
-    TYPE = sands[x][y].type
+    cdef list q = [(x,y)]
+    cdef int TYPE = sands[x][y].type
+    cdef int head = 0
+    cdef _bool res = False
+    cdef int curX, curY
+    cdef int dx, dy
+
     mark[x][y] = marker
-    head = 0
-    res = False
-    while (head<len(queue)):
-        curX, curY = queue[head]
+    while (head<len(q)):
+        curX=q[head][0]
+        curY=q[head][1]
         head += 1
 
         if curX == setting.sandListSize[0]-1:
@@ -120,13 +136,13 @@ def BFSMark(x: int, y: int, mark: 'list[list[int]]', marker: int) -> bool:
                 if mark[curX+dx][curY] == -1:
                     if TYPE == sands[curX+dx][curY].type:
                         mark[curX+dx][curY] = marker
-                        queue.append((curX+dx, curY))
+                        q.append((curX+dx, curY))
         for dy in (-1,1):
             if curY+dy >= 0 and curY+dy < setting.sandListSize[1]:
                 if mark[curX][curY+dy] == -1:
                     if TYPE == sands[curX][curY+dy].type:
                         mark[curX][curY+dy] = marker
-                        queue.append((curX, curY+dy))
+                        q.append((curX, curY+dy))
     
     return res
 

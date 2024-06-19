@@ -11,7 +11,7 @@ class Sand:
 
     def __init__(self, typ: int, color: str):
         self.type = typ  # 沙子的颜色。0-4依次表示红、黄、绿、蓝。-1为空
-        self.color = Color(color)  # 沙子实际渲染时的颜色
+        self.color = color  # 沙子实际渲染时的颜色
     
     def __eq__(self, __value) -> bool:
         if type(__value) != Sand:
